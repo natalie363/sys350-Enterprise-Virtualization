@@ -8,6 +8,7 @@ import re
 def auth():
     """authenticate to vcenter server"""
     hostname,username = get_connect_details()
+    print(f"Enter vCenter credentials for {username}")
     passwd = getpass.getpass()
     s = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     s.verify_mode = ssl.CERT_NONE
@@ -39,7 +40,7 @@ def session_info(auth):
     print(f'User Details: {session_info.userName}')
     print(f'Source IP: {session_info.ipAddress}')
     
-def vm_info(auth, search_name=None):
+def vm_info(auth, search_name=None, milestone5=False):
     """Returns VMs and related info
     Big thanks to https://github.com/vmware/pyvmomi-community-samples/blob/master/samples/getallvms.py"""
     all_content = auth.RetrieveContent()
@@ -51,12 +52,23 @@ def vm_info(auth, search_name=None):
     
     children = view_containers.view
 
+    if milestone5 is True and search_name is None:
+        if search_name == None:
+            vm_list = [child for child in children]
+            return vm_list
+    elif milestone5 is True and search_name is not None:
+        regex_search = re.compile(search_name, re.IGNORECASE)
+        for child in children:
+            if regex_search.search(child.summary.config.name) is not None:
+                vm_list = [child for child in children]
+                return vm_list
+
     if search_name == None:
         for child in children:
             format_vm_info(child)
     else:
         regex_search = re.compile(search_name, re.IGNORECASE)
-        for child in children:
+        for child in children:    
             if regex_search.search(child.summary.config.name) is not None:
                 format_vm_info(child)
 
@@ -72,5 +84,8 @@ def format_vm_info(child):
     print(f'Memory (GB): {mem_gig}')
 
 
-auth_object = auth()
-vm_info(auth_object, "eckles")
+#auth_object = auth()
+#basic_info(auth_object)
+#session_info(auth_object)
+#vm_info(auth_object)
+#vm_info(auth_object,'eckles')
