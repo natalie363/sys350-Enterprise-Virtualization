@@ -52,16 +52,16 @@ def vm_info(auth, search_name=None, milestone5=False):
     
     children = view_containers.view
 
-    if milestone5 is True and search_name is None:
-        if search_name == None:
-            vm_list = [child for child in children]
-            return vm_list
-    elif milestone5 is True and search_name is not None:
+    if milestone5 is True and search_name == None:
+        vm_list = [child for child in children]
+        return vm_list
+    elif milestone5 is True:
+        vm_list = []
         regex_search = re.compile(search_name, re.IGNORECASE)
         for child in children:
             if regex_search.search(child.summary.config.name) is not None:
-                vm_list = [child for child in children]
-                return vm_list
+                vm_list.append(child)
+        return vm_list
 
     if search_name == None:
         for child in children:
