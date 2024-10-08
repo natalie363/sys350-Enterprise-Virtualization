@@ -68,5 +68,17 @@ while cont == "true":
         if proceed.lower() == "y":
             milestone5_pyvmomi_cont.revert_snapshot(filtered_vms)
 
+    elif option == "8":
+        filter_name = input("\nEnter search term for VMs, blank for none: ")
+        filtered_vms = miletone4_pyvmomi_basics.vm_info(main_auth_object,search_name=filter_name,milestone5=True)
+        [print(child.config.name) for child in filtered_vms]
+        proceed = input("Change CPU for these VMS? (y or n): ")
+        if proceed.lower() == "y":
+            count = int(input("Input the new CPU number: "))
+            milestone5_pyvmomi_cont.change_cpu(filtered_vms, count)
+
+    elif option == "9":
+        pass
+
     else:
         cont = "false"

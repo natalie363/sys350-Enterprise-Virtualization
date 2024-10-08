@@ -1,6 +1,6 @@
 import miletone4_pyvmomi_basics
-import time
 from pyVim.task import WaitForTask
+from pyVmomi import vim
 
 # Very helpful resource!! 
 # https://www.ntpro.nl/blog/archives/3751-Mastering-vCenter-Operations-with-Python-A-Script-to-Manage-Your-VMs.html 
@@ -26,6 +26,7 @@ def power_down(set_vms):
             print(f'{vm_name} is already powered off.\n')
 
 def revert_snapshot(set_vms):
+    """Revert to previous snapshot"""
     for vm in set_vms:
         WaitForTask(vm.RevertToCurrentSnapshot_Task())
         print(f'\n{vm.config.name} reverted to the latest snapshot\n')
@@ -39,3 +40,15 @@ def snapshot(set_vms, snapshot_name="newSnap", snapshot_description="pyvmomi sna
         vm.CreateSnapshot(snapshot_name, snapshot_description, False, False)
         )
         print(f'{snapshot_name} created for {vm_name}')
+
+def change_cpu(set_vms, count):
+    """Change CPU of VM"""
+    power_down(set_vms)
+    for vm in set_vms:
+        config = vim.vm.ConfigSpec(numCPUs = count)
+        WaitForTask(vm.Reconfigure(config))
+        print(f"Current CPU for {vm.config.name} is {vm.config.hardware.numCPU}\n")
+    power_on(set_vms)
+
+
+
