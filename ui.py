@@ -1,5 +1,6 @@
 import miletone4_pyvmomi_basics
 import milestone5_pyvmomi_cont
+import getpass
 
 cont = "true"
 main_auth_object = miletone4_pyvmomi_basics.auth()
@@ -15,7 +16,7 @@ while cont == "true":
     print("6. Snapshot VMs")
     print("7. Restore Snapshot")
     print("8. Change CPU Count")
-    print("9. Change Network")
+    print("9. Run command")
     print("10. Quit Program")
     option = input("Enter the number: ")
 
@@ -78,7 +79,17 @@ while cont == "true":
             milestone5_pyvmomi_cont.change_cpu(filtered_vms, count)
 
     elif option == "9":
-        pass
+        filter_name = input("\nEnter search term for VM, blank for none: ")
+        filtered_vms = miletone4_pyvmomi_basics.vm_info(main_auth_object,search_name=filter_name,milestone5=True)
+        child = filtered_vms[0]
+        print(child.config.name)
+        proceed = input("Run program on this VM? (y or n): ")
+        if proceed.lower() == "y":
+            user = input(f'Enter a username for {child.config.name}: ')
+            print(f"Enter credentials for {user}: ")
+            passwd = getpass.getpass()
+            command = input("\nEnter the full command and path you would like to run: ")
+            milestone5_pyvmomi_cont.run_command(filtered_vms, command, main_auth_object, user, passwd)
 
     else:
         cont = "false"
